@@ -10,7 +10,6 @@
        RESET & VARIABLES
     ══════════════════════════════════════ */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
       --text:    #E3D9FC;
       --accent:  #BF40FA;
@@ -22,9 +21,7 @@
       --font-head: 'Syne', sans-serif;
       --font-body: 'DM Sans', sans-serif;
     }
-
     html { scroll-behavior: smooth; }
-
     body {
       background: var(--bg);
       color: var(--text);
@@ -33,7 +30,6 @@
       line-height: 1.65;
       overflow-x: hidden;
     }
-
     ::selection {
       background: var(--accent);
       color: var(--bg);
@@ -58,13 +54,23 @@
     }
 
     /* ══════════════════════════════════════
-       NOISE OVERLAY
+       RIPPLE CANVAS
     ══════════════════════════════════════ */
-    body::before {
-      content: '';
+    #rippleCanvas {
       position: fixed;
       inset: 0;
       z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════
+       NOISE OVERLAY
+    ══════════════════════════════════════ */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 2;
       pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
       opacity: 0.03;
@@ -85,7 +91,6 @@
       width: 500px; height: 500px;
       background: rgba(73, 40, 194, 0.25);
       top: -100px; left: -100px;
-      animation-delay: 0s;
     }
     .blob-2 {
       width: 400px; height: 400px;
@@ -100,10 +105,61 @@
       transform: translate(-50%, -50%);
       animation-delay: -8s;
     }
-
     @keyframes blobFloat {
       0%   { transform: translate(0, 0) scale(1); }
       100% { transform: translate(40px, 30px) scale(1.08); }
+    }
+
+    /* ══════════════════════════════════════
+       PHYSICS CUBE
+    ══════════════════════════════════════ */
+    #physicsCube {
+      position: fixed;
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border: 1px solid rgba(227, 217, 252, 0.2);
+      z-index: 50;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      box-shadow:
+        0 0 20px rgba(191, 64, 250, 0.3),
+        inset 0 0 12px rgba(255,255,255,0.08);
+      transition: box-shadow 0.2s, border-radius 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #physicsCube:active {
+      cursor: grabbing;
+      box-shadow:
+        0 0 40px rgba(191, 64, 250, 0.6),
+        inset 0 0 12px rgba(255,255,255,0.12);
+    }
+    #physicsCube .cube-face {
+      width: 6px; height: 6px;
+      background: rgba(227, 217, 252, 0.5);
+      border-radius: 50%;
+      position: absolute;
+    }
+    #physicsCube .d1 { top: 10px; left: 10px; }
+    #physicsCube .d2 { top: 10px; right: 10px; }
+    #physicsCube .d3 { bottom: 10px; left: 10px; }
+    #physicsCube .d4 { bottom: 10px; right: 10px; }
+
+    /* Cube trail effect */
+    .cube-trail {
+      position: fixed;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 49;
+      background: rgba(191, 64, 250, 0.15);
+      animation: trailFade 0.5s ease forwards;
+    }
+    @keyframes trailFade {
+      to { opacity: 0; transform: scale(0.3); }
     }
 
     /* ══════════════════════════════════════
@@ -111,7 +167,11 @@
     ══════════════════════════════════════ */
     .wrapper {
       position: relative;
-      z-index: 2;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .wrapper * {
+      pointer-events: auto;
     }
 
     .container {
@@ -137,13 +197,11 @@
       border-bottom: 1px solid var(--glass-border);
       padding: 14px 0;
     }
-
     .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-
     .nav-logo {
       font-family: var(--font-head);
       font-weight: 800;
@@ -153,13 +211,11 @@
       letter-spacing: -0.5px;
     }
     .nav-logo span { color: var(--accent); }
-
     .nav-links {
       display: flex;
       gap: 36px;
       list-style: none;
     }
-
     .nav-links a {
       color: rgba(227, 217, 252, 0.6);
       text-decoration: none;
@@ -189,11 +245,7 @@
       align-items: center;
       padding: 120px 0 80px;
     }
-
-    .hero-content {
-      max-width: 760px;
-    }
-
+    .hero-content { max-width: 760px; }
     .hero-badge {
       display: inline-flex;
       align-items: center;
@@ -218,7 +270,6 @@
       0%, 100% { opacity: 1; }
       50%       { opacity: 0.4; }
     }
-
     .hero-title {
       font-family: var(--font-head);
       font-size: clamp(2.8rem, 6vw, 5rem);
@@ -228,16 +279,13 @@
       margin-bottom: 24px;
       animation: fadeInUp 0.8s ease 0.1s both;
     }
-
     .hero-title .line { display: block; }
-
     .hero-title .gradient-text {
       background: linear-gradient(135deg, var(--accent) 0%, #E3D9FC 60%, var(--purple) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
     .hero-sub {
       font-size: 1.1rem;
       color: rgba(227, 217, 252, 0.55);
@@ -247,14 +295,12 @@
       font-weight: 300;
       animation: fadeInUp 0.8s ease 0.2s both;
     }
-
     .hero-buttons {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       animation: fadeInUp 0.8s ease 0.3s both;
     }
-
     .btn {
       display: inline-flex;
       align-items: center;
@@ -270,7 +316,6 @@
       border: none;
       outline: none;
     }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--purple));
       color: #fff;
@@ -280,7 +325,6 @@
       transform: translateY(-2px);
       box-shadow: 0 14px 40px rgba(191, 64, 250, 0.45);
     }
-
     .btn-ghost {
       background: transparent;
       border: 1px solid var(--glass-border);
@@ -292,7 +336,6 @@
       border-color: var(--accent);
       transform: translateY(-2px);
     }
-
     .hero-scroll {
       margin-top: 80px;
       display: flex;
@@ -310,10 +353,7 @@
     /* ══════════════════════════════════════
        SECTION COMMONS
     ══════════════════════════════════════ */
-    section {
-      padding: 100px 0;
-    }
-
+    section { padding: 100px 0; }
     .section-label {
       display: inline-flex;
       align-items: center;
@@ -331,7 +371,6 @@
       width: 24px; height: 1.5px;
       background: var(--accent);
     }
-
     .section-title {
       font-family: var(--font-head);
       font-size: clamp(1.8rem, 3.5vw, 2.8rem);
@@ -340,7 +379,6 @@
       line-height: 1.15;
       margin-bottom: 16px;
     }
-
     .section-desc {
       color: rgba(227, 217, 252, 0.5);
       font-size: 1rem;
@@ -358,12 +396,7 @@
       gap: 60px;
       align-items: center;
     }
-
-    .about-avatar-wrap {
-      position: relative;
-    }
-
-    /* ── Фото «обо мне» ── */
+    .about-avatar-wrap { position: relative; }
     .about-avatar {
       width: 100%;
       aspect-ratio: 1;
@@ -373,7 +406,6 @@
       position: relative;
       background: linear-gradient(135deg, var(--dark) 0%, var(--purple) 100%);
     }
-
     .about-avatar img {
       width: 100%;
       height: 100%;
@@ -382,8 +414,6 @@
       transition: transform 0.5s ease;
     }
     .about-avatar:hover img { transform: scale(1.04); }
-
-    /* Заглушка, пока нет фото */
     .about-avatar .img-placeholder {
       position: absolute;
       inset: 0;
@@ -400,10 +430,7 @@
       width: 48px; height: 48px;
       opacity: 0.3;
     }
-    /* скрываем заглушку, когда img загружена */
     .about-avatar img.loaded + .img-placeholder { display: none; }
-
-    /* Фиолетовый тинт-оверлей поверх фото */
     .about-avatar::after {
       content: '';
       position: absolute;
@@ -411,7 +438,6 @@
       background: linear-gradient(135deg, transparent 50%, rgba(191, 64, 250, 0.12));
       pointer-events: none;
     }
-
     .about-avatar-deco {
       position: absolute;
       width: 160px; height: 160px;
@@ -428,7 +454,6 @@
       bottom: 20px; left: -20px;
       pointer-events: none;
     }
-
     .about-text p {
       color: rgba(227, 217, 252, 0.6);
       font-weight: 300;
@@ -440,7 +465,6 @@
       color: var(--text);
       font-weight: 500;
     }
-
     .about-stats {
       display: flex;
       gap: 32px;
@@ -470,13 +494,11 @@
     #skills {
       background: linear-gradient(180deg, transparent 0%, rgba(91, 42, 98, 0.08) 50%, transparent 100%);
     }
-
     .skills-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
     }
-
     .skill-card {
       background: var(--glass);
       border: 1px solid var(--glass-border);
@@ -496,25 +518,14 @@
     }
     .skill-card:hover { border-color: rgba(191, 64, 250, 0.4); transform: translateY(-4px); }
     .skill-card:hover::before { opacity: 1; }
-
-    .skill-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
-      display: block;
-    }
-
+    .skill-icon { font-size: 2rem; margin-bottom: 16px; display: block; }
     .skill-name {
       font-family: var(--font-head);
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 20px;
     }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
     .tag {
       background: rgba(73, 40, 194, 0.25);
       border: 1px solid rgba(73, 40, 194, 0.4);
@@ -538,7 +549,6 @@
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
     }
-
     .project-card {
       background: var(--glass);
       border: 1px solid var(--glass-border);
@@ -554,21 +564,16 @@
       transform: translateY(-6px);
       box-shadow: 0 20px 60px rgba(73, 40, 194, 0.2);
     }
-
-    /* ── Превью проекта ── */
     .project-thumb {
       height: 200px;
       position: relative;
       overflow: hidden;
       background: linear-gradient(135deg, var(--dark), var(--purple));
     }
-
-    /* Уникальные фоны-заглушки для каждой карточки */
     .project-card:nth-child(1) .project-thumb { background: linear-gradient(135deg, #1a0a3a, #4928C2); }
     .project-card:nth-child(2) .project-thumb { background: linear-gradient(135deg, #2a0a3a, #5B2A62); }
     .project-card:nth-child(3) .project-thumb { background: linear-gradient(135deg, #0a1a3a, #4928C2 60%, #BF40FA); }
     .project-card:nth-child(4) .project-thumb { background: linear-gradient(135deg, #1a0a2a, #5B2A62 60%, #4928C2); }
-
     .project-thumb img {
       width: 100%;
       height: 100%;
@@ -577,8 +582,6 @@
       transition: transform 0.5s ease;
     }
     .project-card:hover .project-thumb img { transform: scale(1.06); }
-
-    /* Оверлей поверх фото проекта */
     .project-thumb::after {
       content: '';
       position: absolute;
@@ -587,8 +590,6 @@
       pointer-events: none;
       z-index: 1;
     }
-
-    /* Заглушка внутри thumb, пока нет фото */
     .project-thumb .img-placeholder {
       position: absolute;
       inset: 0;
@@ -606,20 +607,13 @@
       width: 36px; height: 36px;
       opacity: 0.3;
     }
-
     .project-body {
       padding: 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
     .project-tag {
       background: rgba(73, 40, 194, 0.3);
       border: 1px solid rgba(73, 40, 194, 0.5);
@@ -630,7 +624,6 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
     .project-title {
       font-family: var(--font-head);
       font-size: 1.15rem;
@@ -638,20 +631,13 @@
       margin-bottom: 10px;
       letter-spacing: -0.3px;
     }
-
     .project-desc {
       color: rgba(227, 217, 252, 0.5);
       font-size: 0.88rem;
       line-height: 1.7;
       flex: 1;
     }
-
-    .project-links {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
+    .project-links { display: flex; gap: 12px; margin-top: 20px; }
     .project-link {
       display: inline-flex;
       align-items: center;
@@ -670,13 +656,7 @@
     #contact {
       background: linear-gradient(180deg, transparent 0%, rgba(91, 42, 98, 0.1) 50%, transparent 100%);
     }
-
-    .contact-box {
-      max-width: 680px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
+    .contact-box { max-width: 680px; margin: 0 auto; text-align: center; }
     .contact-title {
       font-family: var(--font-head);
       font-size: clamp(2rem, 4vw, 3.2rem);
@@ -686,21 +666,13 @@
       margin-bottom: 20px;
     }
     .contact-title .accent { color: var(--accent); }
-
     .contact-sub {
       color: rgba(227, 217, 252, 0.45);
       font-size: 1rem;
       font-weight: 300;
       margin-bottom: 44px;
     }
-
-    .contact-links {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
+    .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
     .contact-link {
       display: inline-flex;
       align-items: center;
@@ -734,10 +706,7 @@
       padding: 32px 0;
       text-align: center;
     }
-    footer p {
-      color: rgba(227, 217, 252, 0.2);
-      font-size: 0.8rem;
-    }
+    footer p { color: rgba(227, 217, 252, 0.2); font-size: 0.8rem; }
     footer span { color: var(--accent); }
 
     /* ══════════════════════════════════════
@@ -747,16 +716,12 @@
       from { opacity: 0; transform: translateY(28px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     .reveal {
       opacity: 0;
       transform: translateY(32px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
     /* ══════════════════════════════════════
        CURSOR GLOW
@@ -782,6 +747,7 @@
       .nav-links { display: none; }
       .hero-title { letter-spacing: -1px; }
       .about-stats { gap: 20px; }
+      #physicsCube { width: 38px; height: 38px; border-radius: 8px; }
     }
 
     /* ══════════════════════════════════════
@@ -806,6 +772,17 @@
 
 <!-- PARTICLES -->
 <canvas id="particles"></canvas>
+
+<!-- RIPPLE CANVAS -->
+<canvas id="rippleCanvas"></canvas>
+
+<!-- PHYSICS CUBE -->
+<div id="physicsCube">
+  <span class="cube-face d1"></span>
+  <span class="cube-face d2"></span>
+  <span class="cube-face d3"></span>
+  <span class="cube-face d4"></span>
+</div>
 
 <div class="wrapper">
 
@@ -863,16 +840,9 @@
   <section id="about">
     <div class="container">
       <div class="about-grid">
-
-        <!-- 📸 ЗАМЕНИ src="photo.jpg" на путь к своей фотографии -->
         <div class="about-avatar-wrap reveal">
           <div class="about-avatar">
-            <img
-              src="photo.png"
-              alt="Фото"
-              onerror="this.style.opacity='0'"
-            />
-            <!-- Заглушка, пока нет фото -->
+            <img src="photo.png" alt="Фото" onerror="this.style.opacity='0'" />
             <div class="img-placeholder">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -884,7 +854,6 @@
           <div class="about-avatar-deco"></div>
           <div class="about-avatar-deco-2"></div>
         </div>
-
         <div class="about-text reveal">
           <div class="section-label">Обо мне</div>
           <h2 class="section-title">Немного о себе</h2>
@@ -913,7 +882,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -976,10 +944,7 @@
         <h2 class="section-title">Мои проекты</h2>
         <p class="section-desc">Несколько вещей, которыми я горжусь.</p>
       </div>
-
       <div class="projects-grid">
-
-        <!-- ПРОЕКТ 1 — замени src="project1.jpg" на скрин проекта -->
         <div class="project-card reveal">
           <div class="project-thumb">
             <img src="project1.jpg" alt="Project Alpha" onerror="this.style.display='none'"/>
@@ -1012,7 +977,6 @@
           </div>
         </div>
 
-        <!-- ПРОЕКТ 2 — замени src="project2.jpg" -->
         <div class="project-card reveal">
           <div class="project-thumb">
             <img src="project2.jpg" alt="Project Beta" onerror="this.style.display='none'"/>
@@ -1045,7 +1009,6 @@
           </div>
         </div>
 
-        <!-- ПРОЕКТ 3 — замени src="project3.jpg" -->
         <div class="project-card reveal">
           <div class="project-thumb">
             <img src="project3.jpg" alt="Project Gamma" onerror="this.style.display='none'"/>
@@ -1074,7 +1037,6 @@
           </div>
         </div>
 
-        <!-- ПРОЕКТ 4 — замени src="project4.jpg" -->
         <div class="project-card reveal">
           <div class="project-thumb">
             <img src="project4.jpg" alt="Project Delta" onerror="this.style.display='none'"/>
@@ -1106,7 +1068,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -1122,19 +1083,15 @@
         <p class="contact-sub">
           Есть идея или проект? Напиши мне — обсудим всё детально.
         </p>
-
         <div class="contact-links">
-
-         <a href="https://vk.com/yourusername" target="_blank" class="contact-link">
-  <img src="VKIcon.png" alt="ВКонтакте" class="contact-icon" />
-  ВКонтакте
-</a>
-
+          <a href="https://vk.com/yourusername" target="_blank" class="contact-link">
+            <img src="VKIcon.png" alt="ВКонтакте" class="contact-icon" />
+            ВКонтакте
+          </a>
           <a href="https://t.me/fonraygulag" target="_blank" class="contact-link">
-  <img src="TGIcon.png" alt="Telegram" class="contact-icon" />
-  Telegram
-</a>
-
+            <img src="TGIcon.png" alt="Telegram" class="contact-icon" />
+            Telegram
+          </a>
         </div>
       </div>
     </div>
@@ -1150,20 +1107,26 @@
 </div><!-- end wrapper -->
 
 <script>
-  /* ══ NAVBAR SCROLL ══ */
+  /* ══════════════════════════════════════
+     NAVBAR SCROLL
+  ══════════════════════════════════════ */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  /* ══ CURSOR GLOW ══ */
+  /* ══════════════════════════════════════
+     CURSOR GLOW
+  ══════════════════════════════════════ */
   const glow = document.getElementById('cursorGlow');
   document.addEventListener('mousemove', e => {
     glow.style.left = e.clientX + 'px';
     glow.style.top  = e.clientY + 'px';
   });
 
-  /* ══ SCROLL REVEAL ══ */
+  /* ══════════════════════════════════════
+     SCROLL REVEAL
+  ══════════════════════════════════════ */
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -1177,7 +1140,9 @@
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
 
-  /* ══ PARTICLES CANVAS ══ */
+  /* ══════════════════════════════════════
+     PARTICLES CANVAS
+  ══════════════════════════════════════ */
   const canvas = document.getElementById('particles');
   const ctx    = canvas.getContext('2d');
   let W, H, stars = [];
@@ -1187,7 +1152,7 @@
     H = canvas.height = window.innerHeight;
   }
   resize();
-  window.addEventListener('resize', () => { resize(); initStars(); });
+  window.addEventListener('resize', () => { resize(); initStars(); resizeRipple(); });
 
   function initStars() {
     stars = [];
@@ -1225,6 +1190,277 @@
     requestAnimationFrame(drawStars);
   }
   drawStars();
+
+  /* ══════════════════════════════════════
+     CLICK RIPPLE WAVES
+  ══════════════════════════════════════ */
+  const rippleCanvas = document.getElementById('rippleCanvas');
+  const rCtx = rippleCanvas.getContext('2d');
+  let ripples = [];
+
+  function resizeRipple() {
+    rippleCanvas.width  = window.innerWidth;
+    rippleCanvas.height = window.innerHeight;
+  }
+  resizeRipple();
+
+  // Слушаем клики по всему документу
+  document.addEventListener('click', (e) => {
+    // Добавляем несколько колец за раз для эффекта
+    for (let i = 0; i < 3; i++) {
+      ripples.push({
+        x: e.clientX,
+        y: e.clientY,
+        radius: 4 + i * 8,
+        maxRadius: 160 + i * 60,
+        lineWidth: 2.5 - i * 0.6,
+        alpha: 0.5 - i * 0.1,
+        speed: 3.5 + i * 1.2,
+      });
+    }
+  });
+
+  function drawRipples() {
+    rCtx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const r = ripples[i];
+
+      r.radius += r.speed;
+      // Плавное затухание
+      const progress = r.radius / r.maxRadius;
+      const currentAlpha = r.alpha * (1 - progress);
+
+      if (progress >= 1) {
+        ripples.splice(i, 1);
+        continue;
+      }
+
+      rCtx.beginPath();
+      rCtx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      rCtx.strokeStyle = `rgba(227, 217, 252, ${currentAlpha})`;
+      rCtx.lineWidth = r.lineWidth * (1 - progress * 0.5);
+      rCtx.stroke();
+    }
+
+    requestAnimationFrame(drawRipples);
+  }
+  drawRipples();
+
+  /* ══════════════════════════════════════
+     PHYSICS CUBE  🎲
+  ══════════════════════════════════════ */
+  const cube = document.getElementById('physicsCube');
+  const CUBE_SIZE = 46;
+
+  // Физика
+  const phys = {
+    x: window.innerWidth / 2 - CUBE_SIZE / 2,
+    y: window.innerHeight / 2 - CUBE_SIZE / 2,
+    vx: (Math.random() - 0.5) * 3,
+    vy: 0,
+    rotation: 0,
+    rotationV: 0,
+    gravity: 0.35,
+    friction: 0.997,
+    bounceDamping: 0.65,
+    floorFriction: 0.985,
+  };
+
+  let isDragging = false;
+  let dragOffsetX = 0, dragOffsetY = 0;
+  let mouseX = 0, mouseY = 0;
+  let prevMouseX = 0, prevMouseY = 0;
+  let trailTimer = 0;
+
+  // Таймстемп последних позиций мыши для расчёта скорости броска
+  const mouseHistory = [];
+
+  /* ── Grab ── */
+  function onGrab(clientX, clientY) {
+    isDragging = true;
+    const rect = cube.getBoundingClientRect();
+    dragOffsetX = clientX - rect.left;
+    dragOffsetY = clientY - rect.top;
+    mouseX = clientX; mouseY = clientY;
+    prevMouseX = clientX; prevMouseY = clientY;
+    mouseHistory.length = 0;
+    mouseHistory.push({ x: clientX, y: clientY, t: performance.now() });
+    cube.style.cursor = 'grabbing';
+  }
+
+  /* ── Move ── */
+  function onMove(clientX, clientY) {
+    mouseX = clientX;
+    mouseY = clientY;
+    if (isDragging) {
+      const now = performance.now();
+      mouseHistory.push({ x: clientX, y: clientY, t: now });
+      // Оставляем только последние 80мс
+      while (mouseHistory.length > 1 && now - mouseHistory[0].t > 80) {
+        mouseHistory.shift();
+      }
+    }
+  }
+
+  /* ── Release ── */
+  function onRelease() {
+    if (!isDragging) return;
+    isDragging = false;
+    cube.style.cursor = 'grab';
+
+    // Рассчитываем скорость из истории
+    if (mouseHistory.length >= 2) {
+      const first = mouseHistory[0];
+      const last  = mouseHistory[mouseHistory.length - 1];
+      const dt = (last.t - first.t) || 1;
+      phys.vx = (last.x - first.x) / dt * 16; // нормализуем к ~60fps
+      phys.vy = (last.y - first.y) / dt * 16;
+
+      // Лимит максимальной скорости
+      const maxV = 35;
+      const speed = Math.sqrt(phys.vx * phys.vx + phys.vy * phys.vy);
+      if (speed > maxV) {
+        phys.vx = (phys.vx / speed) * maxV;
+        phys.vy = (phys.vy / speed) * maxV;
+      }
+
+      // Вращение от горизонтальной скорости
+      phys.rotationV = phys.vx * 0.8;
+    }
+  }
+
+  /* ── Mouse events ── */
+  cube.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    onGrab(e.clientX, e.clientY);
+  });
+  document.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+  document.addEventListener('mouseup', onRelease);
+
+  /* ── Touch events ── */
+  cube.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    onGrab(t.clientX, t.clientY);
+  }, { passive: false });
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const t = e.touches[0];
+    onMove(t.clientX, t.clientY);
+  }, { passive: false });
+  document.addEventListener('touchend', onRelease);
+  document.addEventListener('touchcancel', onRelease);
+
+  /* ── Spawn trail particle ── */
+  function spawnTrail(x, y, size) {
+    const trail = document.createElement('div');
+    trail.classList.add('cube-trail');
+    trail.style.left   = x + 'px';
+    trail.style.top    = y + 'px';
+    trail.style.width  = size + 'px';
+    trail.style.height = size + 'px';
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 500);
+  }
+
+  /* ── Physics loop ── */
+  function physicsTick() {
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight;
+
+    if (isDragging) {
+      // Плавно перемещаем к курсору
+      phys.x += (mouseX - dragOffsetX - phys.x) * 0.4;
+      phys.y += (mouseY - dragOffsetY - phys.y) * 0.4;
+      phys.vx = 0;
+      phys.vy = 0;
+      phys.rotationV *= 0.9;
+    } else {
+      // Гравитация
+      phys.vy += phys.gravity;
+
+      // Трение воздуха
+      phys.vx *= phys.friction;
+      phys.vy *= phys.friction;
+
+      // Движение
+      phys.x += phys.vx;
+      phys.y += phys.vy;
+
+      // ── Столкновения с границами ──
+
+      // Пол
+      if (phys.y + CUBE_SIZE > viewH) {
+        phys.y = viewH - CUBE_SIZE;
+        phys.vy *= -phys.bounceDamping;
+        phys.vx *= phys.floorFriction;
+        phys.rotationV = phys.vx * 2;
+        // Если уже еле скачет — остановить
+        if (Math.abs(phys.vy) < 1.5) phys.vy = 0;
+      }
+
+      // Потолок
+      if (phys.y < 0) {
+        phys.y = 0;
+        phys.vy *= -phys.bounceDamping;
+      }
+
+      // Правая стена
+      if (phys.x + CUBE_SIZE > viewW) {
+        phys.x = viewW - CUBE_SIZE;
+        phys.vx *= -phys.bounceDamping;
+        phys.rotationV *= -0.5;
+      }
+
+      // Левая стена
+      if (phys.x < 0) {
+        phys.x = 0;
+        phys.vx *= -phys.bounceDamping;
+        phys.rotationV *= -0.5;
+      }
+    }
+
+    // Вращение
+    phys.rotation += phys.rotationV;
+    phys.rotationV *= 0.98;
+
+    // Применяем
+    cube.style.left = phys.x + 'px';
+    cube.style.top  = phys.y + 'px';
+    cube.style.transform = `rotate(${phys.rotation}deg)`;
+
+    // Динамическое свечение от скорости
+    const speed = Math.sqrt(phys.vx * phys.vx + phys.vy * phys.vy);
+    const glowIntensity = Math.min(speed / 20, 1);
+    const glowSize = 20 + glowIntensity * 30;
+    cube.style.boxShadow = `
+      0 0 ${glowSize}px rgba(191, 64, 250, ${0.3 + glowIntensity * 0.4}),
+      inset 0 0 12px rgba(255,255,255,${0.08 + glowIntensity * 0.07})
+    `;
+
+    // Деформация при высокой скорости
+    const squish = 1 + glowIntensity * 0.08;
+    const stretch = 1 - glowIntensity * 0.05;
+    const angle = Math.atan2(phys.vy, phys.vx) * (180 / Math.PI);
+    // Небольшой scale по направлению движения
+    cube.style.borderRadius = (10 + glowIntensity * 6) + 'px';
+
+    // След при высокой скорости
+    trailTimer++;
+    if (speed > 8 && trailTimer % 2 === 0) {
+      const trailSize = CUBE_SIZE * (0.4 + Math.random() * 0.3);
+      spawnTrail(
+        phys.x + CUBE_SIZE / 2 - trailSize / 2,
+        phys.y + CUBE_SIZE / 2 - trailSize / 2,
+        trailSize
+      );
+    }
+
+    requestAnimationFrame(physicsTick);
+  }
+  physicsTick();
+
 </script>
 
 </body>
